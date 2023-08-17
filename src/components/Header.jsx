@@ -1,38 +1,19 @@
-import { useEffect, useRef, useState } from "react"
+import useValidateForm from "../hooks/useValidateForm";
 
 
-const Header = () => {
-
-
-    let [isEmptyStr, setIsEmptyStr] = useState(false);
-    let [msg, setMsg] = useState("");
-
-    const movieToSearchRef = useRef();
+const Header = ({ fetchMovies }) => {
+   
+    const { validateFormData, isFormValid, msg, movieToSearch } = useValidateForm({FormData})
 
     async function handleSubmit (e) {
         e.preventDefault()
-        const movieName = movieToSearchRef.current.value;
-        if (movieName === "" || isBlank(movieName) ){
-          setMsg("You must write a valid name to search")
-          setIsEmptyStr(true)
-          return
-        }
-        console.log(movieName)
-        //setMoviesList(data)
+        console.log(movieToSearch)
+        const formData = Object.fromEntries( new window.FormData (e.target)) //fields
+        validateFormData(formData)
+        
     }
 
-    function isBlank (str) {
-      return (!str || /^\s*$/.test(str));
-    }
-
-    useEffect ( () => {
-      setTimeout ( () => {
-        setMsg("")
-        setIsEmptyStr(false)
-      },5000)
-    },[isEmptyStr])
-    
-
+   
   return (
 
     <div className="w-full bg-slate-400 p-5">
@@ -43,17 +24,19 @@ const Header = () => {
         onSubmit={ handleSubmit}>
         <input
             className="w-[300] h-[40px] shadow border-l-purple-600 rounded-md" 
+            name="movieToSearch"
             type="text" 
             placeholder="X-Men, Ender's games" 
-            ref={movieToSearchRef}
             />
+   
         <input
             className="w-[150px] h-[40px] shadow rounded-md bg-purple-800 hover:bg-purple-600 cursor-pointer text-white font-bold" 
             type="submit" 
             value={"BUSCAR"}/>
     </form>
 
-    {isEmptyStr && <p className="text-white font-bold p-3 bg-red-700 rounded-md w-1/3 mx-auto text-center">{msg}</p>}
+    {!isFormValid && <p className="text-white font-bold p-3 bg-red-700 rounded-md w-1/3 mx-auto text-center">{msg}</p>}
+
 
     </div>
   )
